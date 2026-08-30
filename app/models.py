@@ -18,15 +18,15 @@ class PixKey(Base):
     __tablename__ = "pix_keys"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    key_type: Mapped[str] = mapped_column(String(255))
-    key_value: Mapped[str] = mapped_column(String(255), unique=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    key_type: Mapped[str] = mapped_column(String(255), nullable=False)
+    key_value: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
 
 class Transfer(Base):
     __tablename__ = "transfers"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    idempotency_key: Mapped[str] = mapped_column(String(255), unique=True)
+    idempotency_key: Mapped[str] = mapped_column(String(255), unique=True, nullable=False) #avoids unsolicited/repited transfers
     sender_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     receiver_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     amount: Mapped[Decimal] = mapped_column(Numeric(10, 2))

@@ -1,0 +1,172 @@
+{
+  "info": {
+    "_postman_id": "8f3c6e8b-7f6c-4a7a-9f6a-1d5b2c8e4a11",
+    "name": "PIX Core Lite",
+    "description": "Collection para testar os 5 endpoints da API PIX Core Lite.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "idempotency_key",
+      "value": "550e8400-e29b-41d4-a716-446655440000"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cpf\": \"11111111111\",\n  \"password\": \"123456\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('access_token foi retornado', function () { pm.expect(json.access_token).to.be.a('string').and.not.empty; });",
+              "pm.environment.set('access_token', json.access_token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Account Balance",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/account/balance",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "account",
+            "balance"
+          ]
+        }
+      }
+    },
+    {
+      "name": "3. Create PIX Key",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"key_type\": \"CPF\",\n  \"key_value\": \"11111111111\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/pix/keys",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pix",
+            "keys"
+          ]
+        }
+      }
+    },
+    {
+      "name": "4. PIX Transfer",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "X-Idempotency-Key",
+            "value": "{{idempotency_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pix_key_receiver\": \"22222222222\",\n  \"amount\": 150.0\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/pix/transfer",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pix",
+            "transfer"
+          ]
+        }
+      }
+    },
+    {
+      "name": "5. PIX Transfer History",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/pix/transfers",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pix",
+            "transfers"
+          ]
+        }
+      }
+    }
+  ]
+}
